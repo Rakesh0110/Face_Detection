@@ -1,34 +1,24 @@
-#import required libraries
 import cv2
-import numpy as np
-import dlib
-#connect to your webcam
-cap=cv2.VideoCapture(0)
-#detect the coordinates
-detector=dlib.get_frontal_face_detector()
-#capture frame continously
+
+face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+
+
+cap = cv2.VideoCapture(0)
+
 while True:
-  ret,frame=cap.read()
-  frame=cv2.flip(frame,1)
-  gray=cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
-  faces=detector(gray)
-  i=0
-#counting no of faces
-  for face in faces:
-    #get the cordinates of faces
-    x,y=face.left(),face.top()
-    x1,y1=face.right(),face.bottom()
-    cv2.rectangle(frame,(x,y),(x1,y1),(0,255,0),2)
-    #increment for each faces
-    i=i+1
-    #display the box and faces
-    cv2.putText(frame,'Face_'+str(i),(x-10,y-10),cv2.FONT_HERSHEY_SIMPLEX,0.7,(0,0,255),2)
-    print(face,i)
-  #display the resulting frame
-  cv2.imshow('frame', frame)
-  #press q button to quit
-  if cv2.waitKey(1)& 0xFF==ord('q'):
-    break
-#release the capture nd destroy windows
+    ret, img = cap.read()
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    faces = face_cascade.detectMultiScale(gray, 1.1, 4)
+    i=0
+    for (x,y,w,h) in faces:
+        cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
+        i=i+1
+        cv2.putText(img,'Face_'+str(i),(x-10,y-10),cv2.FONT_HERSHEY_SIMPLEX,0.7,(0,0,255),2)
+        #print(face,i)
+    cv2.imshow('img',img)
+    k = cv2.waitKey(30) & 0xff
+    if k == 27:
+        break
+
 cap.release()
 cv2.destroyAllWindows()
